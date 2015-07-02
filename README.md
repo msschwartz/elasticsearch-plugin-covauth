@@ -1,5 +1,5 @@
 ## Covisint Authorization Elasticsearch Plugin
-Warning: this is just a draft version.
+Warning: This is just a draft version.
 
 #### Testing
 The _package-and-start-server.sh_ script can be used to package the plugin and fire up an 
