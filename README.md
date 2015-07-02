@@ -1,4 +1,5 @@
-== Covisint Authorization Elasticsearch Plugin ==
+Covisint Authorization Elasticsearch Plugin
+===========================================
 This is just a draft version.
 
 ==== Testing ====
