@@ -9,71 +9,65 @@ import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.rest.RestRequest;
 import org.junit.Test;
 
+import com.covisint.elasticsearch.covauth.exception.*;
+import com.covisint.elasticsearch.covauth.util.*;
+
 public class RequestParserTest {
 	
 	
 	@Test
-    public void testGetUserIdFromRequestReturnsPortalUserIdFromHeaderAsString() throws RequestParser.InvalidUserIdException {
+    public void testGetUserIdFromRequestReturnsPortalUserIdFromHeaderAsString() throws InvalidUserIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", null);
-		RequestParser parser = new RequestParser(request);
-		assertEquals("sample-user-id", parser.getUserIdFromRequest());
+		assertEquals("sample-user-id", RequestParserUtil.getUserIdFromRequest(request));
     }
 	
-	@Test(expected=RequestParser.InvalidUserIdException.class)
-    public void testGetUserIdFromRequestThrowsExceptionIfNotExist() throws RequestParser.InvalidUserIdException {
+	@Test(expected=InvalidUserIdException.class)
+    public void testGetUserIdFromRequestThrowsExceptionIfNotExist() throws InvalidUserIdException {
 		RestRequest request = blankRequest();
-		RequestParser parser = new RequestParser(request);
-		parser.getUserIdFromRequest();
+		RequestParserUtil.getUserIdFromRequest(request);
     }
 	
-	@Test(expected=RequestParser.InvalidUserIdException.class)
-    public void testGetUserIdFromRequestThrowsExceptionIfBlank() throws RequestParser.InvalidUserIdException {
+	@Test(expected=InvalidUserIdException.class)
+    public void testGetUserIdFromRequestThrowsExceptionIfBlank() throws InvalidUserIdException {
 		RestRequest request = requestWithUserIdAndPath("", null);
-		RequestParser parser = new RequestParser(request);
-		parser.getUserIdFromRequest();
+		RequestParserUtil.getUserIdFromRequest(request);
     }
 	
 	
 	@Test
-	public void testGetGroupIdFromRequestReturnsString() throws RequestParser.InvalidGroupIdException {
+	public void testGetGroupIdFromRequestReturnsString() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", "/sample-group-id");
-		RequestParser parser = new RequestParser(request);
-		assertEquals("sample-group-id", parser.getGroupIdFromRequest());
+		assertEquals("sample-group-id", RequestParserUtil.getInstanceIdFromRequest(request));
 	}
 	
 	@Test
-	public void testGetGroupIdFromRequestReturnsStringWhenPathHasQuery() throws RequestParser.InvalidGroupIdException {
+	public void testGetGroupIdFromRequestReturnsStringWhenPathHasQuery() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", "/sample-group-id/search?q=1");
-		RequestParser parser = new RequestParser(request);
-		assertEquals("sample-group-id", parser.getGroupIdFromRequest());
+		assertEquals("sample-group-id", RequestParserUtil.getInstanceIdFromRequest(request));
 	}
 	
-	@Test(expected=RequestParser.InvalidGroupIdException.class)
-	public void testGetGroupIdFromRequestThrowsExceptionIfBlank() throws RequestParser.InvalidGroupIdException {
+	@Test(expected=InvalidInstanceIdException.class)
+	public void testGetGroupIdFromRequestThrowsExceptionIfBlank() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", "");
-		RequestParser parser = new RequestParser(request);
-		parser.getGroupIdFromRequest();
+		RequestParserUtil.getInstanceIdFromRequest(request);
 	}
 	
-	@Test(expected=RequestParser.InvalidGroupIdException.class)
-	public void testGetGroupIdFromRequestThrowsExceptionIfJustSlash() throws RequestParser.InvalidGroupIdException {
+	@Test(expected=InvalidInstanceIdException.class)
+	public void testGetGroupIdFromRequestThrowsExceptionIfJustSlash() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", "/");
-		RequestParser parser = new RequestParser(request);
-		parser.getGroupIdFromRequest();
+		RequestParserUtil.getInstanceIdFromRequest(request);
 	}
 	
-	@Test(expected=RequestParser.InvalidGroupIdException.class)
-	public void testGetGroupIdFromRequestThrowsExceptionIfNotExist() throws RequestParser.InvalidGroupIdException {
+	@Test(expected=InvalidInstanceIdException.class)
+	public void testGetGroupIdFromRequestThrowsExceptionIfNotExist() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", null);
-		RequestParser parser = new RequestParser(request);
-		parser.getGroupIdFromRequest();
+		RequestParserUtil.getInstanceIdFromRequest(request);
 	}
 	
-	@Test(expected=RequestParser.InvalidGroupIdException.class)
-	public void testGetGroupIdFromRequestThrowsExceptionFormatWrong() throws RequestParser.InvalidGroupIdException {
+	@Test(expected=InvalidInstanceIdException.class)
+	public void testGetGroupIdFromRequestThrowsExceptionFormatWrong() throws InvalidInstanceIdException {
 		RestRequest request = requestWithUserIdAndPath("sample-user-id", "/_sample-group-id/search?q=1");
-		RequestParser parser = new RequestParser(request);
-		parser.getGroupIdFromRequest();
+		RequestParserUtil.getInstanceIdFromRequest(request);
 	}
 	
 	

@@ -11,61 +11,18 @@ import org.elasticsearch.rest.RestRequest.Method;
 import org.junit.Test;
 
 import com.covisint.elasticsearch.covauth.apiservice.MockApiService;
+import com.covisint.elasticsearch.covauth.util.*;
 
 public class RequestAuthorizerTest {
 	
 	@Test
-	public void testAllowsAccessIfUserHasMembershipToGroup() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
+	public void testRequestIsDeniedUnlessGet() {
+		MockApiService service = new MockApiService();
+		assertTrue(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "user1", "group1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.PUT), "user1", "group1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.POST), "user1", "group1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.DELETE), "user1", "group1"));
 	}
-	
-	@Test
-	public void testAllowsAccessIfUserHasMembershipToGroupWhenMultipleMembershipsExist() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		groups.add("group2");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
-		assertTrue(authorizer.canUserViewGroup("user1", "group2"));
-	}
-	
-	@Test
-	public void testDenysRequestIfNonGet() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.POST));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-		authorizer = new RequestAuthorizer(service, restRequest(Method.DELETE));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-		authorizer = new RequestAuthorizer(service, restRequest(Method.PUT));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-	}
-	
-	@Test
-	public void testDenysRequestIfUserHasNoMemberships() {
-		List<String> emptyList = new ArrayList<String>();
-		MockApiService service = new MockApiService(emptyList);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-	}
-	
-	@Test
-	public void testDenysRequestIfGroupNotExistInMemberships() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		groups.add("group2");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
-		assertFalse(authorizer.canUserViewGroup("user1", "group3"));
-	}
-	
 	
 	
 	private RestRequest restRequest(final Method method) {

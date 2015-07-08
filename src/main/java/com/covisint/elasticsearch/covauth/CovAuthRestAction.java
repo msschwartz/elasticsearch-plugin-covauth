@@ -1,7 +1,5 @@
 package com.covisint.elasticsearch.covauth;
 
-import java.util.Arrays;
-
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -14,13 +12,26 @@ import org.elasticsearch.rest.RestFilterChain;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestStatus;
 
-import com.covisint.elasticsearch.covauth.apiservice.MockApiService;
+import com.covisint.elasticsearch.covauth.apiservice.*;
+import com.covisint.elasticsearch.covauth.exception.*;
+import com.covisint.elasticsearch.covauth.util.*;
 
+/**
+ * Authorizes every REST request using a RestFilter on the main RestController.
+ * 
+ * @author Michael.Schwartz@covisint.com
+ */
 public class CovAuthRestAction extends BaseRestHandler {
 	
+	private final ApiService service;
+	private final ConfigurationHelper config;
+	
 	@Inject
-	public CovAuthRestAction(final Settings settings, Client client, RestController controller) {
+	public CovAuthRestAction(Settings settings, RestController controller, Client client) {
 		super(settings, controller, client);
+		
+		config = new ConfigurationHelper(settings, logger);
+		service = new CovisintApiService(config, logger);
 		
 		controller.registerFilter(new RestFilter() {
 			
@@ -33,33 +44,29 @@ public class CovAuthRestAction extends BaseRestHandler {
 					deny(request, filterChain, channel);
 				}
 			}
+			
 		});
 	}
 	
 	/**
-	 * Check if user can view logs for the requested group id. Only GET requests will be allowed.
+	 * Checks if user can view logs for the requested instance id.
 	 * 
 	 * @param request
 	 * @return boolean
 	 */
 	public boolean checkRequest(RestRequest request) {
-		// Temporary mock service - this needs to be initialized somewhere else.
-		MockApiService service = new MockApiService(Arrays.asList("group1", "group2", "group3"));
-		
 		try {
-			RequestParser parser = new RequestParser(request);
-			String userId = parser.getUserIdFromRequest();
-			String groupId = parser.getGroupIdFromRequest();
+			String userId = RequestParserUtil.getUserIdFromRequest(request);
+			String instanceId = RequestParserUtil.getInstanceIdFromRequest(request);
 			
-			RequestAuthorizer authorizer = new RequestAuthorizer(service, request);
-			return authorizer.canUserViewGroup(userId, groupId);
+			return RequestAuthorizerUtil.checkRequest(service, request, userId, instanceId);
 		}
-		catch (RequestParser.InvalidUserIdException ex) {
+		catch (InvalidUserIdException ex) {
 			logger.info("Denying request because user id was invalid", request);
 			return false;
 		}
-		catch (RequestParser.InvalidGroupIdException ex) {
-			logger.info("Denying request because group id was invalid", request);
+		catch (InvalidInstanceIdException ex) {
+			logger.info("Denying request because instance id was invalid", request);
 			return false;
 		}
 	}
