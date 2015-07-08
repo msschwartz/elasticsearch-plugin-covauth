@@ -1,3 +1,4 @@
+/* Copyright (C) 2015 Covisint. All Rights Reserved. */
 package com.covisint.elasticsearch.covauth;
 
 import java.util.regex.*;
