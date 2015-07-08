@@ -15,4 +15,10 @@
             </excludes>
         </dependencySet>
     </dependencySets>
+    <files>
+        <file>
+            <source>src/test/resources/user-group-memberships.json</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
 </assembly>

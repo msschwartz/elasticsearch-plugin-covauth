@@ -12,61 +12,42 @@ import org.elasticsearch.rest.RestRequest.Method;
 import org.junit.Test;
 
 import com.covisint.elasticsearch.covauth.apiservice.MockApiService;
+import com.covisint.elasticsearch.covauth.util.*;
 
 public class RequestAuthorizerTest {
 	
 	@Test
-	public void testAllowsAccessIfUserHasMembershipToGroup() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
+	public void testRequestIsAllowedIfGroupHasViewLogsEntitlement() {
+		MockApiService service = new MockApiService("user-group-memberships.json");
+		assertTrue(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "realm", "user", "instance1"));
 	}
 	
 	@Test
-	public void testAllowsAccessIfUserHasMembershipToGroupWhenMultipleMembershipsExist() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		groups.add("group2");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
-		assertTrue(authorizer.canUserViewGroup("user1", "group2"));
+	public void testRequestIsAllowedIfGroupHasViewLogsEntitlementWhenMoreEntitlementsExist() {
+		MockApiService service = new MockApiService("user-group-memberships.json");
+		assertTrue(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "realm", "user", "instance3"));
 	}
 	
 	@Test
-	public void testDenysRequestIfNonGet() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.POST));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-		authorizer = new RequestAuthorizer(service, restRequest(Method.DELETE));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
-		authorizer = new RequestAuthorizer(service, restRequest(Method.PUT));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
+	public void testRequestIsDeniedIfGroupDoesNotHaveViewLogsEntitlement() {
+		MockApiService service = new MockApiService("user-group-memberships.json");
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "realm", "user", "instance2"));
 	}
 	
 	@Test
-	public void testDenysRequestIfUserHasNoMemberships() {
-		List<String> emptyList = new ArrayList<String>();
-		MockApiService service = new MockApiService(emptyList);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertFalse(authorizer.canUserViewGroup("user1", "group1"));
+	public void testRequestIsDeniedIfUserHasNoMemberships() {
+		MockApiService service = new MockApiService("empty-user-group-memberships.json");
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "realm", "user", "instance1"));
 	}
 	
 	@Test
-	public void testDenysRequestIfGroupNotExistInMemberships() {
-		List<String> groups = new ArrayList<String>();
-		groups.add("group1");
-		groups.add("group2");
-		MockApiService service = new MockApiService(groups);
-		RequestAuthorizer authorizer = new RequestAuthorizer(service, restRequest(Method.GET));
-		assertTrue(authorizer.canUserViewGroup("user1", "group1"));
-		assertFalse(authorizer.canUserViewGroup("user1", "group3"));
+	public void testRequestIsDeniedUnlessGet() {
+		MockApiService service = new MockApiService("user-group-memberships.json");
+		assertTrue(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.GET), "realm", "user", "instance1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.PUT), "realm", "user", "instance1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.POST), "realm", "user", "instance1"));
+		assertFalse(RequestAuthorizerUtil.checkRequest(service, restRequest(Method.DELETE), "realm", "user", "instance1"));
 	}
-	
 	
 	
 	private RestRequest restRequest(final Method method) {

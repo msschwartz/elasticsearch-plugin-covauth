@@ -1,0 +1,50 @@
+[
+  {
+    "group": {
+      "owner": {
+        "id": "instance1",
+      },
+      "entitlements": [
+        {
+          "name": "view-logs"
+        }
+      ]
+    }
+  },
+  {
+    "group": {
+      "owner": {
+        "id": "instance2",
+      },
+      "entitlements": [
+        {
+          "name": "full-access"
+        }
+      ]
+    }
+  },
+  {
+    "group": {
+      "owner": {
+        "id": "instance3",
+      },
+      "entitlements": [
+        {
+          "name": "full-access"
+        }
+      ]
+    }
+  },
+  {
+    "group": {
+      "owner": {
+        "id": "instance3",
+      },
+      "entitlements": [
+        {
+          "name": "view-logs"
+        }
+      ]
+    }
+  },
+]
