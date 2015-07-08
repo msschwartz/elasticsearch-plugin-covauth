@@ -29,7 +29,7 @@ public class CovisintApiService implements ApiService {
 	 * @param logger
 	 */
 	public CovisintApiService(ConfigurationHelper config, ESLogger logger) {
-		GroupMembershipSDK sdk = new GroupMembershipSDK("https://apistg.np.covapp.io/group/v1");
+		GroupMembershipSDK sdk = new GroupMembershipSDK(config.groupServiceBaseUrl);
 		sdk.setAuthConfigProvider(new CovAuthConfigurationProvider(config, logger));
 		groupMembershipClient = sdk.newClient();
 	}

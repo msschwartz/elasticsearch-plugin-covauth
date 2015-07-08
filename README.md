@@ -14,6 +14,7 @@ E.g.
 ```yaml
 covauth:
     authServiceBaseUrl: https://api.domain.com/oauth/v1
+    groupServiceBaseUrl: https://api.domain.com/group/v1
 	applicationId: xxxxxx
 	clientId: xxxxxx
 	clientSecret: xxxxxx

@@ -16,6 +16,7 @@ public class ConfigurationHelper {
 	private final static String ES_YAML_CONF_PREFIX = "covauth.";
 	
 	public final String authServiceBaseUrl;
+	public final String groupServiceBaseUrl;
 	public final String applicationId;
 	public final String clientId;
 	public final String clientSecret;
@@ -23,6 +24,7 @@ public class ConfigurationHelper {
 	public ConfigurationHelper(Settings settings, ESLogger logger) {
 		Settings s = settings.getByPrefix(ES_YAML_CONF_PREFIX);
 		this.authServiceBaseUrl = s.get("authServiceBaseUrl");
+		this.groupServiceBaseUrl = s.get("groupServiceBaseUrl");
 		this.applicationId = s.get("applicationId");
 		this.clientId = s.get("clientId");
 		this.clientSecret = s.get("clientSecret");
